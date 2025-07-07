@@ -79,7 +79,7 @@ Displays song details and includes a progress bar and playlist support.
 
 <b>Mohammed Raiyan A</b><br>
 🎓 CSE Student | 💼 Frontend Developer Intern at CodeAlpha<br>
-📧 Email: mohammedraiyaneajas@gmail.com<br>
+📧 [Email] (mohammedraiyaneajas@gmail.com)<br>
 🔗 [LinkedIn](https://www.linkedin.com/in/mohammed-raiyan21/)<br>
 
 
@@ -87,6 +87,6 @@ Displays song details and includes a progress bar and playlist support.
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).<br>
+This project is licensed under the [MIT License].<br>
 
 > 💡 Replace <code>Mohammed Raiyan A</code> with your actual GitHub username and update demo links after deployment.
