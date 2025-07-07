@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Image Gallery</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      text-align: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    h1 {
+      color: white;
+      font-size: 3rem;
+      margin: 30px 0;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      animation: fadeInDown 1s ease-out;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease infinite, fadeInDown 1s ease-out;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-buttons {
+      margin-bottom: 30px;
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    .filter-buttons button {
+      margin: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transform: translateY(0);
+    }
+
+    .filter-buttons button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .filter-buttons button:hover::before {
+      left: 100%;
+    }
+
+    .filter-buttons button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    }
+
+    .filter-buttons button:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    .filter-buttons button.active {
+      background: linear-gradient(45deg, #f9ca24, #f0932b);
+      box-shadow: 0 6px 20px rgba(249, 202, 36, 0.4);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 0 20px;
+      animation: fadeIn 1s ease-out 0.6s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .gallery-item {
+      width: 320px;
+      height: 220px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      padding: 3px;
+      animation: slideInUp 0.8s ease-out;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .gallery-item:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+
+    .gallery-item:nth-child(3n) {
+      animation-delay: 0.4s;
+    }
+
+    .gallery-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+      background-size: 400% 400%;
+      animation: gradientRotate 4s ease infinite;
+      border-radius: 20px;
+      z-index: -1;
+    }
+
+    @keyframes gradientRotate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 17px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .gallery-item:hover img {
+      filter: brightness(1.1) contrast(1.1) saturate(1.2);
+    }
+
+    .gallery-item::after {
+      content: '🔍';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 2;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .gallery-item:hover::after {
+      opacity: 1;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      animation: fadeInLightbox 0.3s ease-out;
+    }
+
+    @keyframes fadeInLightbox {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .lightbox-content {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: zoomIn 0.3s ease-out;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .close, .prev, .next {
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      padding: 15px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .close {
+      top: 30px;
+      right: 30px;
+      font-size: 50px;
+      transform: none;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .close:hover, .prev:hover, .next:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .close:hover {
+      transform: scale(1.1) rotate(90deg);
+    }
+
+    .prev { left: 30px; }
+    .next { right: 30px; }
+
+    .prev:hover { transform: translateY(-50%) translateX(-5px); }
+    .next:hover { transform: translateY(-50%) translateX(5px); }
+
+    /* Category specific colors */
+    .gallery-item.snacks::before {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    }
+
+    .gallery-item.juices::before {
+      background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    }
+
+    .gallery-item.desserts::before {
+      background: linear-gradient(45deg, #f9ca24, #f0932b);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+        margin: 20px 0;
+      }
+
+      .gallery-item {
+        width: 90%;
+        height: 200px;
+      }
+
+      .filter-buttons button {
+        padding: 10px 20px;
+        font-size: 14px;
+        margin: 5px;
+      }
+
+      .close {
+        font-size: 40px;
+        top: 20px;
+        right: 20px;
+      }
+
+      .prev, .next {
+        font-size: 30px;
+        padding: 10px;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      opacity: 0;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍴 Delicious Food Gallery</h1>
+
+  <div class="filter-buttons">
+    <button onclick="filterImages('all')" class="active">🌟 All</button>
+    <button onclick="filterImages('snacks')">🍿 Snacks</button>
+    <button onclick="filterImages('juices')">🥤 Juices</button>
+    <button onclick="filterImages('desserts')">🍰 Desserts</button>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-item snacks">
+      <img src="https://i.pinimg.com/736x/80/30/72/8030727314b1b950376d0dc83e249add.jpg" alt="Delicious Snacks" onclick="openLightbox(this)">
+    </div>
+    <div class="gallery-item juices">
+      <img src="https://i.pinimg.com/736x/52/8f/5d/528f5d2a73aa426465e9c6ac33dfd8fe.jpg" alt="Fresh Juices" onclick="openLightbox(this)">
+    </div>
+    <div class="gallery-item desserts">
+      <img src="https://i.pinimg.com/736x/6a/c0/bf/6ac0bf66d9a5eef592f74e816a1d7fd0.jpg" alt="Sweet Desserts" onclick="openLightbox(this)">
+    </div>
+    <div class="gallery-item snacks">
+      <img src="https://i.pinimg.com/736x/ca/c0/eb/cac0eb2cd61432569bee361803e7c772.jpg" alt="Tasty Snacks" onclick="openLightbox(this)">
+    </div>
+    <div class="gallery-item juices">
+      <img src="https://i.pinimg.com/736x/a8/a0/23/a8a02360ed2e30250aa95736e68fb212.jpg" alt="Refreshing Juices" onclick="openLightbox(this)">
+    </div>
+    <div class="gallery-item desserts">
+      <img src="https://i.pinimg.com/736x/e7/57/65/e75765c135d436e321e3cd2887a405b3.jpg" alt="Heavenly Desserts" onclick="openLightbox(this)">
+    </div>
+  </div>
+
+  <div id="lightbox" class="lightbox">
+    <span class="close" onclick="closeLightbox()">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+    <div class="prev" onclick="changeImage(-1)">&#10094;</div>
+    <div class="next" onclick="changeImage(1)">&#10095;</div>
+  </div>
+
+  <script>
+    let currentImageIndex = 0;
+    let galleryImages = [];
+    let currentFilter = 'all';
+
+    function openLightbox(imgElement) {
+      const visibleImages = Array.from(document.querySelectorAll('.gallery-item:not([style*="display: none"]) img'));
+      galleryImages = visibleImages;
+      currentImageIndex = galleryImages.indexOf(imgElement);
+      
+      const lightboxImg = document.getElementById("lightbox-img");
+      lightboxImg.classList.add('loading');
+      lightboxImg.src = imgElement.src;
+      
+      lightboxImg.onload = function() {
+        lightboxImg.classList.remove('loading');
+      };
+      
+      document.getElementById("lightbox").style.display = "block";
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+
+    function changeImage(direction) {
+      if (galleryImages.length === 0) return;
+      
+      currentImageIndex += direction;
+      if (currentImageIndex < 0) currentImageIndex = galleryImages.length - 1;
+      if (currentImageIndex >= galleryImages.length) currentImageIndex = 0;
+      
+      const lightboxImg = document.getElementById("lightbox-img");
+      lightboxImg.classList.add('loading');
+      lightboxImg.src = galleryImages[currentImageIndex].src;
+      
+      lightboxImg.onload = function() {
+        lightboxImg.classList.remove('loading');
+      };
+    }
+
+    function filterImages(category) {
+      currentFilter = category;
+      const items = document.querySelectorAll('.gallery-item');
+      const buttons = document.querySelectorAll('.filter-buttons button');
+      
+      // Update active button
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Filter items with animation
+      items.forEach((item, index) => {
+        if (category === 'all' || item.classList.contains(category)) {
+          item.style.display = 'block';
+          item.style.animation = `slideInUp 0.6s ease-out ${index * 0.1}s both`;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById("lightbox").style.display === "block") {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') changeImage(-1);
+        if (e.key === 'ArrowRight') changeImage(1);
+      }
+    });
+
+    // Close lightbox when clicking outside image
+    document.getElementById("lightbox").addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLightbox();
+      }
+    });
+
+    // Smooth entrance animations
+    window.addEventListener('load', function() {
+      document.body.style.opacity = '1';
+    });
+  </script>
+</body>
+</html>
